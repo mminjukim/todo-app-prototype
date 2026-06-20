@@ -8,7 +8,7 @@ import java.io.Serializable
 data class TodoItem(
 
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    val id: Long,
 
     var content: String,
 
