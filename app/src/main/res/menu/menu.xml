@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menuAdd"
+        android:title="@string/menu_add" />
+    <item
+        android:id="@+id/menuIntroduction"
+        android:title="@string/menu_introduction" />
+    <item
+        android:id="@+id/menuExit"
+        android:title="@string/menu_exit" />
+</menu>
