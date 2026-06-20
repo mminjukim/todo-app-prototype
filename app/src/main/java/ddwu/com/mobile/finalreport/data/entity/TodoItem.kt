@@ -2,6 +2,7 @@ package ddwu.com.mobile.finalreport.data.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.io.Serializable
 
 @Entity(tableName = "todo_item")
 data class TodoItem(
@@ -18,4 +19,5 @@ data class TodoItem(
     var isDone: Boolean = false,
 
     var categoryId: Int?,
-)
+
+): Serializable

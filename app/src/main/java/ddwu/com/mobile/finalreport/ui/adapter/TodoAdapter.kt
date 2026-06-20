@@ -2,6 +2,7 @@ package ddwu.com.mobile.finalreport.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -51,6 +52,9 @@ class TodoAdapter : ListAdapter<TodoItem, TodoAdapter.TodoViewHolder>(itemDiffCa
     }
 
     var checkBoxClickListener: ((position: Int) -> Unit)? = null
+    var itemClickListener: ((item: TodoItem) -> Unit)? = null
+    var editClickListener: ((item: TodoItem) -> Unit)? = null
+    var deleteClickListener: ((item: TodoItem) -> Unit)? = null
 
     inner class TodoViewHolder(val binding: ItemTodoBinding)
         : RecyclerView.ViewHolder(binding.root) {
@@ -58,6 +62,30 @@ class TodoAdapter : ListAdapter<TodoItem, TodoAdapter.TodoViewHolder>(itemDiffCa
         init {
             binding.cbIsDone.setOnClickListener {
                 checkBoxClickListener?.invoke(bindingAdapterPosition)
+            }
+            binding.root.setOnClickListener {
+                itemClickListener?.invoke(getItem(bindingAdapterPosition))
+            }
+            binding.root.setOnLongClickListener {
+                val item = getItem(bindingAdapterPosition)
+                // 팝업 메뉴 생성
+                val popupMenu = PopupMenu(binding.root.context, binding.root)
+                popupMenu.menuInflater.inflate(R.menu.todo_popup, popupMenu.menu)
+                popupMenu.setOnMenuItemClickListener { menuItem ->
+                    when (menuItem.itemId) {
+                        R.id.action_edit -> {
+                            editClickListener?.invoke(item)
+                            true
+                        }
+                        R.id.action_delete -> {
+                            deleteClickListener?.invoke(item)
+                            true
+                        }
+                        else -> false
+                    }
+                }
+                popupMenu.show()
+                true
             }
         }
     }

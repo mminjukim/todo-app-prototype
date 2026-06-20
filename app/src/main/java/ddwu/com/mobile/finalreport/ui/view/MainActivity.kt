@@ -65,6 +65,51 @@ class MainActivity : AppCompatActivity() {
                 refreshRecyclerView()
             }
         }
+        adapter.itemClickListener = { item ->
+            val categoryName = when (item.categoryId) {
+                1 -> "개인"
+                2 -> "학업"
+                3 -> "쇼핑"
+                else -> "기타"
+            }
+            val iconRes = when (item.categoryId) {
+                1 -> R.drawable.ic_person
+                2 -> R.drawable.ic_academic
+                3 -> R.drawable.ic_shopping
+                else -> R.drawable.ic_launcher_foreground
+            }
+            val isDoneText = if (item.isDone) "완료" else "미완료"
+            var message = "카테고리: $categoryName \n마감일: ${item.dueDate} \n상태: $isDoneText"
+            if (!item.memo.isNullOrEmpty()) {
+                message += "\n\n[메모]\n${item.memo}"
+            }
+            val builder = AlertDialog.Builder(this)
+                .setIcon(iconRes)
+                .setTitle(item.content)
+                .setMessage(message)
+                .setPositiveButton("확인", null)
+            builder.show()
+        }
+        adapter.editClickListener = { item ->
+            val intent = Intent(this, EditActivity::class.java)
+            intent.putExtra("item", item)
+            startActivity(intent)
+        }
+        adapter.deleteClickListener = { item ->
+            val builder = AlertDialog.Builder(this).apply {
+                setTitle("할 일 삭제")
+                setMessage("[${item.content}] 할 일을 삭제하시겠습니까?")
+                setPositiveButton("삭제") { _, _ ->
+                    CoroutineScope(Dispatchers.IO).launch {
+                        todoDao.deleteTodoItem(item)
+                        refreshRecyclerView()
+                    }
+                }
+                setNegativeButton("취소", null)
+                setCancelable(true)
+            }
+            builder.show()
+        }
 
         // layoutManager 설정
         val layoutManager = LinearLayoutManager(applicationContext)
@@ -125,7 +170,16 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.menuExit -> {
-                finish()
+                val builder = AlertDialog.Builder(this).apply {
+                    setTitle("앱 종료")
+                    setMessage("앱을 종료하시겠습니까?")
+                    setPositiveButton("종료") { _, _ ->
+                        finish()
+                    }
+                    setNegativeButton("취소", null)
+                    setCancelable(true)
+                }
+                builder.show()
                 true
             }
             else -> super.onOptionsItemSelected(item)
