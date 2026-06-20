@@ -21,8 +21,11 @@ import ddwu.com.mobile.finalreport.databinding.ActivityMainBinding
 import ddwu.com.mobile.finalreport.ui.adapter.TodoAdapter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,6 +39,12 @@ class MainActivity : AppCompatActivity() {
         TodoDatabase.getDatabase(applicationContext).todoDao()
     }
 
+    val adapter = TodoAdapter()
+
+    var showFinishedTodoItems: Boolean = false
+
+    lateinit var allTodoList: List<TodoItem>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -47,12 +56,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         // adapter 설정
-        val adapter = TodoAdapter()
         adapter.checkBoxClickListener = { position: Int ->
             val item: TodoItem = adapter.currentList[position]
             item.isDone = !item.isDone
             CoroutineScope(Dispatchers.IO).launch {
+                delay(300L.milliseconds)
                 todoDao.updateTodoItem(item)
+                refreshRecyclerView()
             }
         }
 
@@ -70,11 +80,21 @@ class MainActivity : AppCompatActivity() {
 
         // 아이템 Flow 관찰
         lifecycleScope.launch { repeatOnLifecycle(Lifecycle.State.STARTED) {
-            val listFlow = todoDao.getAllTodoItems()
+            val listFlow: Flow<List<TodoItem>> = todoDao.getAllTodoItems()
             listFlow.distinctUntilChanged().collect { items ->
-                adapter.submitList(items)
+                allTodoList = items
+                refreshRecyclerView()
             }
         }}
+    }
+
+    fun refreshRecyclerView() {
+        val filteredList = if (showFinishedTodoItems) {
+            allTodoList
+        } else {
+            allTodoList.filter { !it.isDone }
+        }
+        adapter.submitList(filteredList)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -86,6 +106,12 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.menuAdd -> {
                 startActivity(Intent(this, AddActivity::class.java))
+                true
+            }
+            R.id.menuVisibility -> {
+                item.isChecked = !item.isChecked
+                showFinishedTodoItems = item.isChecked
+                refreshRecyclerView()
                 true
             }
             R.id.menuIntroduction -> {

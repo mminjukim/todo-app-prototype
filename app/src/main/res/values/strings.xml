@@ -2,6 +2,7 @@
     <string name="app_name">Final_02_20230774</string>
     <string name="app_title">Todo</string>
     <string name="menu_add">할 일 추가</string>
+    <string name="menu_visibility">완료된 할 일 보기</string>
     <string name="menu_introduction">개발자 소개</string>
     <string name="menu_exit">앱 종료</string>
 </resources>
