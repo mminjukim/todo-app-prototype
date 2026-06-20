@@ -10,6 +10,9 @@
         android:checkable="true"
         android:title="@string/menu_visibility" />
     <item
+        android:id="@+id/menuDeleteDoneItems"
+        android:title="완료된 할 일 삭제" />
+    <item
         android:id="@+id/menuIntroduction"
         android:title="@string/menu_introduction" />
     <item

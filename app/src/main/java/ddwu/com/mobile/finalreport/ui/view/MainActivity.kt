@@ -159,10 +159,26 @@ class MainActivity : AppCompatActivity() {
                 refreshRecyclerView()
                 true
             }
+            R.id.menuDeleteDoneItems -> {
+                val builder = AlertDialog.Builder(this).apply {
+                    setTitle("완료된 할 일 삭제")
+                    setMessage("완료된 할 일을 전부 삭제하시겠습니까?")
+                    setPositiveButton("삭제") { _, _ ->
+                        CoroutineScope(Dispatchers.IO).launch {
+                            todoDao.deleteDoneItems()
+                            refreshRecyclerView()
+                        }
+                    }
+                    setNegativeButton("취소", null)
+                    setCancelable(true)
+                }
+                builder.show()
+                true
+            }
             R.id.menuIntroduction -> {
                 val builder = AlertDialog.Builder(this).apply {
                     setTitle("Todo App")
-                    setMessage("모바일소프트웨어 02분반 20230774 김민주입니다.")
+                    setMessage("모바일소프트웨어 02분반 20230774 김민주입니다.\n아이템을 한 번 클릭하면 상세보기, 길게 클릭하면 수정/삭제할 수 있습니다.")
                     setPositiveButton("확인", null)
                     setCancelable(true)
                 }
